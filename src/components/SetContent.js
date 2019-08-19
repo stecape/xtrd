@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import axios from 'axios'
 import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import Grid from '@material-ui/core/Grid'
@@ -50,7 +49,7 @@ export default class SetContent extends Component {
     }
 
     this.handleChange = this.handleChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
+    this.set = this.set.bind(this)
     this.handleFocusIn = this.handleFocusIn.bind(this)
   }
 
@@ -58,21 +57,39 @@ export default class SetContent extends Component {
     this.setState({ internalVal: event.target.value })
   }
 
-  handleSubmit = (event) => {
+
+
+  callBackendAPI = async (url, data) => {
+    var headers = {
+       "Content-Type": "application/json",                                                                                                
+       "Access-Control-Origin": "*"
+    }
+    const response = await fetch (url, {
+                                          method: 'POST',
+                                          headers: headers,
+                                          body: JSON.stringify(data)
+                                        })
+    const body = await response.json()
+
+    if (response.status !== 200) {
+      throw Error(body.message) 
+    }
+    return body
+  }
+
+
+  set = (event) => {
     //chiamata a funzione di set lato Python
+    event.preventDefault()
+    event.stopPropagation()
     var data ={}
     data['tag'] = this.state.Name
     data['val'] = this.state.internalVal
-    event.preventDefault()
-    event.stopPropagation()
-    axios({
-      method: 'post',
-      url: 'http://127.0.0.1:3002/set',
-      data: data
-    }).then((result) =>{
-      this.setState(result.data)
-      this.setState({internalVal: result.data.setpoint.HMIVal})
-    })
+    this.callBackendAPI('/api/set', data)
+      .then((result) =>{
+        this.setState(result)
+        this.setState({internalVal: result.setpoint.HMIVal})
+      })
   }
 
 
@@ -114,7 +131,7 @@ export default class SetContent extends Component {
     }
     return (
       <Grid item>
-        <form method="post" onSubmit={this.handleSubmit}>
+        <form method="post" onSubmit={this.set}>
           <CSSTextField
             id={this.state.Name}
             name={this.state.Name}

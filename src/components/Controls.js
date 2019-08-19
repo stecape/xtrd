@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import axios from 'axios'
 import Typography from '@material-ui/core/Typography'
 import Setpoint from "./Set"
 import Actual from "./Act"
@@ -24,20 +23,38 @@ export default class Controls extends Component {
     this.setState({[tag]: {status: val}})
   }
 
-  axiosFunc = () => {
-    //chiamata a funzione di update stato lato Python
-    axios.get('http://127.0.0.1:3002/getData').then(results => {
+  callBackendAPI = async (url, data) => {
+    var headers = {
+       "Content-Type": "application/json",                                                                                                
+       "Access-Control-Origin": "*"
+    }
+    const response = await fetch (url, {
+                                          method: 'POST',
+                                          headers: headers,
+                                          body: JSON.stringify(data)
+                                        })
+    const body = await response.json()
 
-      var res = JSON.parse(results.data.replace(/'/g, ''))
-      res.map((item) => {
-        return this.setState({[item.Name]: item}) 
+    if (response.status !== 200) {
+      throw Error(body.message) 
+    }
+    return body
+  }
+
+  getData = () => {
+    //chiamata a funzione di update stato lato Python
+    this.callBackendAPI('/api/getData', {data: ""})
+      .then(res => {
+        res.map((item) => {
+          return this.setState({[item.Name]: item}) 
+        })
       })
-    })
+      .catch(err => console.log(err))
   }
 
   componentDidMount() {
-    this.axiosFunc()
-    this.interval = setInterval(this.axiosFunc, 5000)
+    this.getData()
+    this.interval = setInterval(this.getData, 5000)
   }
 
   componentWillUnmount() {
@@ -51,7 +68,7 @@ export default class Controls extends Component {
           Controls
         </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={2}>
+        <Grid item xs={12} sm={6} md={6}>
           <Grid container spacing={1} direction="column" alignItems="stretch">
             <Setpoint tag={this.state.Temperature}/>
             <Actual tag={this.state.Pressure} />

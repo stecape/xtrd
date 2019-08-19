@@ -9,7 +9,7 @@ from HMI import * #Conversion, Evaluate, Set, LogicSelection, LogicButton, Logic
 
 
 with open('py/json/Conv.json') as config_file:
-    data = json.load(config_file)
+  data = json.load(config_file)
 
 Conv = {}
 
@@ -18,7 +18,7 @@ for key in data:
 
 
 with open('py/json/Vect.json') as config_file:
-    data = json.load(config_file)
+  data = json.load(config_file)
 
 Vect = {}
 
@@ -26,7 +26,7 @@ for key in data:
   Vect[key] = parseVect(key, data[key], Conv)
 
 for Item in Vect:
-   Evaluate(Vect[Item])
+  Evaluate(Vect[Item])
 
 
 def returnJSON (item):
@@ -41,13 +41,13 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['CORS_METHOD'] = 'POST'
 
 
-@app.route("/getData")
+@app.route("/getData", methods=['POST', 'GET'])
 @cross_origin()
 def getData():
-	for Item in Vect:
-   		Evaluate(Vect[Item])
-	VectStr = list(map(returnJSON, Vect))
-	return str(VectStr)
+  for Item in Vect:
+    Evaluate(Vect[Item])
+  VectStr = list(map(returnJSON, Vect))
+  return str(VectStr)
 
 
 @app.route("/set", methods=['POST', 'GET'])

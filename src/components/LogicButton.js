@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import axios from 'axios'
 import Container from './Container'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Button from '@material-ui/core/Button'
@@ -28,26 +27,42 @@ export default class LogicButton extends Component {
       classe: 'LogicButton'
     }
     this.isActive = this.isActive.bind(this)
-    this.sendCommand = this.sendCommand.bind(this)
+    this.logicButton = this.logicButton.bind(this)
   }
 
   isActive = (index) => {
     return this.state.status[index]
   }
 
-  sendCommand = (index, val) => {
+
+  callBackendAPI = async (url, data) => {
+    var headers = {
+       "Content-Type": "application/json",                                                                                                
+       "Access-Control-Origin": "*"
+    }
+    const response = await fetch (url, {
+                                          method: 'POST',
+                                          headers: headers,
+                                          body: JSON.stringify(data)
+                                        })
+    const body = await response.json()
+
+    if (response.status !== 200) {
+      throw Error(body.message) 
+    }
+    return body
+  }
+
+  logicButton = (index, val) => {
     //chiamata a funzione di logicSelection lato Python
     var data ={}
     data['tag'] = this.state.Name
     data['index'] = index
     data['val'] = val
-    axios({
-      method: 'post',
-      url: 'http://127.0.0.1:3002/logicButton',
-      data: data
-    }).then((result) =>{
-      this.props.updateLogicStatus(result.data.status)
-    })
+    this.callBackendAPI('/api/logicSelection', data)
+      .then((result) =>{
+        this.props.updateLogicStatus(result.status)
+      })
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -73,20 +88,20 @@ export default class LogicButton extends Component {
                       key={item}
                       color='primary'
                       variant='contained'
-                      onMouseDown={() => this.sendCommand(index, true)}
-                      onMouseUp={() => this.sendCommand(index, false)}
-                      onMouseOut={() => this.sendCommand(index, false)}
-                      onBlur={() => this.sendCommand(index, false)}
+                      onMouseDown={() => this.logicButton(index, true)}
+                      onMouseUp={() => this.logicButton(index, false)}
+                      onMouseOut={() => {if (this.state.status[index]) {this.logicButton(index, false)}}}
+                      onBlur={() => this.logicButton(index, false)}
                     >
                       {item}
                     </Button>
                   ) : ( 
                     <Button 
                       key={item}
-                      onMouseDown={() => this.sendCommand(index, true)}
-                      onMouseUp={() => this.sendCommand(index, false)}
-                      onMouseOut={() => this.sendCommand(index, false)}
-                      onBlur={() => this.sendCommand(index, false)}
+                      onMouseDown={() => this.logicButton(index, true)}
+                      onMouseUp={() => this.logicButton(index, false)}
+                      onMouseOut={() => {if (this.state.status[index]) {this.logicButton(index, false)}}}
+                      onBlur={() => this.logicButton(index, false)}
                     >
                       {item}
                     </Button>

@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import axios from 'axios'
 import Container from './Container'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Button from '@material-ui/core/Button'
@@ -28,26 +27,42 @@ export default class LogicSelection extends Component {
       classe: 'LogicSelection'
     }
     this.isActive = this.isActive.bind(this)
-    this.sendCommand = this.sendCommand.bind(this)
+    this.logicSelection = this.logicSelection.bind(this)
   }
 
   isActive = (index) => {
     return this.state.status[index]
   }
 
-  sendCommand = (index, val) => {
+
+  callBackendAPI = async (url, data) => {
+    var headers = {
+       "Content-Type": "application/json",                                                                                                
+       "Access-Control-Origin": "*"
+    }
+    const response = await fetch (url, {
+                                          method: 'POST',
+                                          headers: headers,
+                                          body: JSON.stringify(data)
+                                        })
+    const body = await response.json()
+
+    if (response.status !== 200) {
+      throw Error(body.message) 
+    }
+    return body
+  }
+
+  logicSelection = (index, val) => {
     //chiamata a funzione di logicSelection lato Python
     var data ={}
     data['tag'] = this.state.Name
     data['index'] = index
     data['val'] = val
-    axios({
-      method: 'post',
-      url: 'http://127.0.0.1:3002/logicSelection',
-      data: data
-    }).then((result) =>{
-      this.props.updateLogicStatus(result.data.status)
-    })
+    this.callBackendAPI('/api/logicSelection', data)
+      .then((result) =>{
+        this.props.updateLogicStatus(result.status)
+      })
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -73,14 +88,14 @@ export default class LogicSelection extends Component {
                       key={item}
                       color='primary'
                       variant='contained'
-                      onClick={() => this.sendCommand(index, true)}
+                      onClick={() => this.logicSelection(index, true)}
                     >
                       {item}
                     </Button>
                   ) : ( 
                     <Button 
                       key={item}
-                      onClick={() => this.sendCommand(index, true)}
+                      onClick={() => this.logicSelection(index, true)}
                     >
                       {item}
                     </Button>
