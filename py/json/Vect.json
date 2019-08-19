@@ -1,0 +1,32 @@
+{
+	"Temperature"		: {
+		"classe"				: "Set",
+		"conversion"		: "degCdegF",
+		"min"						: 20,
+		"max"						: 200
+	},
+	"Pressure"			: {
+		"classe"				: "Act",
+		"conversion"		: "mmH2Ompsi",
+		"min"						: 0,
+		"max"						: 300
+	},
+	"Tension"				: {
+		"classe"				: "SetAct",
+		"conversion"		: "Nlb",
+		"min"						: 50,
+		"max"						: 550
+	},
+	"Motor"					: {
+		"classe"				: "LogicSelection",
+		"labels"				: ["Off", "On"]
+	},
+	"Jog"						: {
+		"classe"				: "LogicButton",
+		"labels"				: ["Off", "Up", "Down", "Right", "Left"]
+	},
+	"LimitSwitch"		: {
+		"classe"				: "LogicVisualization",
+		"labels"				: ["Off", "On"]
+	}
+}
