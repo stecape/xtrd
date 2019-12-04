@@ -1,17 +1,10 @@
 import React, { Component } from 'react'
 import Typography from '@material-ui/core/Typography'
-import Setpoint from "./Set"
-import Actual from "./Act"
-import SetAct from "./SetAct"
-import LogicSelection from "./LogicSelection"
-import LogicButton from "./LogicButton"
-import LogicVisualization from "./LogicVisualization"
 import Grid from '@material-ui/core/Grid'
 
 
 
-
-export default class Controls extends Component {
+export default class Page extends Component {
   constructor(props) {
     super(props)
     this.state = { 
@@ -25,7 +18,7 @@ export default class Controls extends Component {
 
   callBackendAPI = async (url, data) => {
     var headers = {
-       "Content-Type": "application/json",                                                                                                
+       "Content-Type": "application/json; charset=utf-8",                                                                                                
        "Access-Control-Origin": "*"
     }
     const response = await fetch (url, {
@@ -42,11 +35,13 @@ export default class Controls extends Component {
   }
 
   getData = () => {
-    //chiamata a funzione di update stato lato Python
-    this.callBackendAPI('/api/getData', {data: ""})
+    //chiamata a funzione di update stato lato Server
+    this.callBackendAPI(this.props.call, {data: ""})
       .then(res => {
-        res.map((item) => {
-          return this.setState({[item.Name]: item}) 
+        Object.keys(res.ProbeData).map((key) => {
+          var value = Number(res.ProbeData[key])
+          //this.setState({[key]: value})
+          return this.props.returnValue(this.props.mapping[key], value)
         })
       })
       .catch(err => console.log(err))
@@ -54,7 +49,7 @@ export default class Controls extends Component {
 
   componentDidMount() {
     this.getData()
-    this.interval = setInterval(this.getData, 5000)
+    this.interval = setInterval(this.getData, 1000)
   }
 
   componentWillUnmount() {
@@ -62,20 +57,16 @@ export default class Controls extends Component {
   }
 
   render() {
+
     return (
       <div>
         <Typography variant="h4" color="inherit">
-          Controls
+          {this.props.title}
         </Typography>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={6}>
             <Grid container spacing={1} direction="column" alignItems="stretch">
-              <Setpoint tag={this.state.Temperature}/>
-              <Actual tag={this.state.Pressure} />
-              <SetAct tag={this.state.Tension} />
-              <LogicSelection tag={this.state.Motor} updateLogicStatus={(val) => this.updateLogicStatus("Motor", val)} />
-              <LogicButton tag={this.state.Jog} updateLogicStatus={(val) => this.updateLogicStatus("Jog", val)} />
-              <LogicVisualization tag={this.state.LimitSwitch} />
+                {this.props.children}
             </Grid>
           </Grid>
         </Grid>

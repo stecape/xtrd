@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
 const axios = require('axios')
+const he = require('he')
 
 const app = express()
 
@@ -23,6 +24,26 @@ app.post('/api/getData', (req,res) => {
     //   .then((results) => {
     //     res.status(200).send(JSON.parse(results.data.replace(/'/g, '')))
     //   })
+})
+
+// Update valori da PLC 1UW
+app.post('/api/getUNWData', (req,res) => {
+  //chiamata a funzione di update stato lato Python
+  axios({
+    method: 'post',
+    url: 'http://172.17.5.31/awp/React/ProbeData.html',
+    data: req.body,
+  }).then((results) =>{
+      var ans = he.decode(results.data)
+      ans = ans.substring(ans.indexOf("{"))
+      ans = JSON.parse(ans.substring(0,ans.lastIndexOf("}")+1).trim())
+      res.status(200).send(ans)
+    })
+
+  // axios.get('http://127.0.0.1:3002/getData')
+  //   .then((results) => {
+  //     res.status(200).send(JSON.parse(results.data.replace(/'/g, '')))
+  //   })
 })
 
 // impostazione setpoint
