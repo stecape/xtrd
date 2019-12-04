@@ -35,10 +35,10 @@ export default class ActContent extends Component {
       conversion: {
         PIunit: '',
         HMIunit: '',
-        scale: 1,
-        offset: 0,
-        PIDecimals: 0,
-        HMIDecimals: 0,
+        'scale': 1,
+        'offset': 0,
+        'PIDecimals': 0,
+        'HMIDecimals': 0,
       },
       limits: {
         PIMin: 0,

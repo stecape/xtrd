@@ -67,18 +67,18 @@ export default class Controls extends Component {
         <Typography variant="h4" color="inherit">
           Controls
         </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={6}>
-            <Grid container spacing={1} direction="column" alignItems="stretch">
-              <Setpoint tag={this.state.Temperature}/>
-              <Actual tag={this.state.Pressure} />
-              <SetAct tag={this.state.Tension} />
-              <LogicSelection tag={this.state.Motor} updateLogicStatus={(val) => this.updateLogicStatus("Motor", val)} />
-              <LogicButton tag={this.state.Jog} updateLogicStatus={(val) => this.updateLogicStatus("Jog", val)} />
-              <LogicVisualization tag={this.state.LimitSwitch} />
-            </Grid>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={6}>
+          <Grid container spacing={1} direction="column" alignItems="stretch">
+            <Setpoint tag={this.state.Temperature}/>
+            <Actual tag={this.state.Pressure} />
+            <SetAct tag={this.state.Tension} />
+            <LogicSelection tag={this.state.Motor} updateLogicStatus={(val) => this.updateLogicStatus("Motor", val)} />
+            <LogicButton tag={this.state.Jog} updateLogicStatus={(val) => this.updateLogicStatus("Jog", val)} />
+            <LogicVisualization tag={this.state.LimitSwitch} />
           </Grid>
         </Grid>
+      </Grid>
       </div>
     )
   }
